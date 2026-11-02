@@ -1,5 +1,6 @@
 package ru.netology.statsview.ui
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -7,6 +8,7 @@ import android.graphics.PointF
 import android.graphics.RectF
 import android.util.AttributeSet
 import android.view.View
+import android.view.animation.LinearInterpolator
 import androidx.core.content.withStyledAttributes
 import ru.netology.statsview.R
 import ru.netology.statsview.utils.AndroidUtils
@@ -44,8 +46,10 @@ class StatsView @JvmOverloads constructor(
     var data: List<Float> = emptyList()
         set(value) {
             field = value
-            invalidate()
+            update()
         }
+    private var progress: Float = 0F
+    private var animator: ValueAnimator? = null
     private var radius = 0F
     private var center = PointF()
     private var oval = RectF()
@@ -84,18 +88,17 @@ class StatsView @JvmOverloads constructor(
         /*if (total == 0F) {
             return
         }*/
-        var startAngle = -90F
         data.forEachIndexed { index, datum ->
-            val angle = (datum / total) * 360F
+            val initialAngle = -90F
+            var startAngle: Float = initialAngle + (90 * index)
+            val angle = (datum / total) * 360F * progress
             paint.color = colors[index]
             if (index == data.size - 1) {
                 canvas.drawArc(oval, startAngle, angle - 1, false, paint)
                 paint.color = colors[0]
-                startAngle += angle
-                canvas.drawArc(oval, startAngle - 1, 1F, false, paint)
+                canvas.drawArc(oval, initialAngle, 1F, false, paint)
             } else {
                 canvas.drawArc(oval, startAngle, angle, false, paint)
-                startAngle += angle
             }
         }
         canvas.drawText(
@@ -111,4 +114,17 @@ class StatsView @JvmOverloads constructor(
     }
 
     private fun generateRandomColor() = Random.nextInt(0xFF000000.toInt(), 0xFFFFFFFF.toInt())
+    private fun update(){
+        animator?.clone()
+        animator = ValueAnimator.ofFloat(0F, 1F).apply {
+            duration = 10_000
+            interpolator = LinearInterpolator()
+            addUpdateListener { anim ->
+                progress = anim.animatedValue as Float
+                invalidate()
+            }
+        }.also {
+            it.start()
+        }
+    }
 }
