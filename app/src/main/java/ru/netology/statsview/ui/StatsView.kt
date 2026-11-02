@@ -90,15 +90,14 @@ class StatsView @JvmOverloads constructor(
         }*/
         data.forEachIndexed { index, datum ->
             val initialAngle = -90F
-            var startAngle: Float = initialAngle + (90 * index)
+            var startAngle: Float = initialAngle + (90 * index) + (progress * 360F)
             val angle = (datum / total) * 360F * progress
             paint.color = colors[index]
+            canvas.drawArc(oval, startAngle, angle, false, paint)
             if (index == data.size - 1) {
-                canvas.drawArc(oval, startAngle, angle - 1, false, paint)
                 paint.color = colors[0]
-                canvas.drawArc(oval, initialAngle, 1F, false, paint)
-            } else {
-                canvas.drawArc(oval, startAngle, angle, false, paint)
+                startAngle = initialAngle + (90 * 0) + (progress * 360F)
+                canvas.drawArc(oval, startAngle, 1F, false, paint)
             }
         }
         canvas.drawText(
@@ -114,7 +113,7 @@ class StatsView @JvmOverloads constructor(
     }
 
     private fun generateRandomColor() = Random.nextInt(0xFF000000.toInt(), 0xFFFFFFFF.toInt())
-    private fun update(){
+    private fun update() {
         animator?.clone()
         animator = ValueAnimator.ofFloat(0F, 1F).apply {
             duration = 10_000

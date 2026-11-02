@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
             500F,
             500F
         )
-        val textView = findViewById<TextView>(R.id.label)
+        /*val textView = findViewById<TextView>(R.id.label)
         view.startAnimation(
             AnimationUtils.loadAnimation(this, R.anim.animation).apply {
                 setAnimationListener(object : Animation.AnimationListener {
@@ -36,6 +36,6 @@ class MainActivity : AppCompatActivity() {
                     }
                 })
             }
-        )
+        )*/
     }
 }
